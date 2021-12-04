@@ -9,24 +9,30 @@ use Illuminate\Support\Facades\Validator;
 class products extends Controller
 {
 
-    // private function calcPrice($price1 , $price2 , $price3 , $date1 , $date2 , $date3){
-    //     //the Curent Date
-    //     $curDay = date('j');
-    //     $curMonth = date('n');
-    //     $curYear = date('Y');
-
-
-    // }
     public function index(){
         // Get The Products by newest
-        $product = Product::orderBy('created_at' , 'desc')->get();
+        $product = Product::orderBy('created_at' , 'desc')->get([
+            'name' ,
+            'description' ,
+            'expiryDate' ,
+            'mainPrice' ,
+            'quantity' ,
+            'date1' ,
+            'price1' ,
+            'date2' ,
+            'price2' ,
+            'date3' ,
+            'price3',
+            'imgUrl'
+        ]);
 
         // $curPrice = calcPrice()
 
-        $jsoncontnet = json_decode($product , true);
+        $jsonContent = json_decode($product , true);
+
         return response()->json([
-            'messaeg' => "The List Of Product : ",
-            'Products' => $jsoncontnet
+            'message' => "The List Of Product : ",
+            'Products' => $jsonContent
         ]);
     }
 
@@ -71,7 +77,20 @@ class products extends Controller
 
     public function show($productId){
         // Get The Product
-        $product = Product::find($productId);
+        $product = Product::find($productId)->get([
+            'name' ,
+            'description' ,
+            'expiryDate' ,
+            'mainPrice' ,
+            'quantity' ,
+            'date1' ,
+            'price1' ,
+            'date2' ,
+            'price2' ,
+            'date3' ,
+            'price3',
+            'imgUrl'
+        ]);
 
         // Handling Wrong ID
         if(!$product){
@@ -79,9 +98,9 @@ class products extends Controller
         }
 
         // Don't Forget to handel the variables that you want to send
-        $jsoncontnet = json_decode($product , true);
+        $jsonContent = json_decode($product , true);
         return response()->json([
-            "Products" => $jsoncontnet
+            "Products" => $jsonContent
         ]);
     }
 
@@ -97,10 +116,24 @@ class products extends Controller
         $searchBy = $request->input('searchBy');
         $search = $request->input('search');
 
-        $product = Product::where($searchBy , $search)->get();
-        $jsoncontnet = json_decode($product , true);
+        $product = Product::where($searchBy , $search)->get([
+            'name' ,
+            'description' ,
+            'expiryDate' ,
+            'mainPrice' ,
+            'quantity' ,
+            'date1' ,
+            'price1' ,
+            'date2' ,
+            'price2' ,
+            'date3' ,
+            'price3',
+            'imgUrl'
+        ]);
+
+        $jsonContent = json_decode($product , true);
         return response()->json([
-            "Products" => $jsoncontnet
+            "Products" => $jsonContent
         ]);
     }
 
