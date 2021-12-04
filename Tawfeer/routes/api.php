@@ -18,6 +18,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
 Route::prefix('auth')->group(function(){
     Route::post('register' , [App\Http\Controllers\users::class , 'register']);
 });
+
+
+Route::prefix('products')->group(function(){
+    Route::post('/' , [App\Http\Controllers\products::class , 'store']);
+    Route::get('/' , [App\Http\Controllers\products::class , 'indx']);
+    Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
+    Route::post('/search' , [App\Http\Controllers\products::class , 'search']);
+    Route::delete('/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
+    Route::put('/{productId}' , [App\Http\Controllers\products::class , 'update']);
+});
+
