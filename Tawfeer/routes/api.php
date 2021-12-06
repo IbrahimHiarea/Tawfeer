@@ -21,15 +21,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('auth')->group(function(){
     Route::post('register' , [App\Http\Controllers\users::class , 'register']);
+    Route::post('login' , [App\Http\Controllers\users::class , 'login']);
 });
-
 
 Route::prefix('products')->group(function(){
-    Route::post('/' , [App\Http\Controllers\products::class , 'store']);
-    Route::get('/' , [App\Http\Controllers\products::class , 'indx']);
-    Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
-    Route::post('/search' , [App\Http\Controllers\products::class , 'search']);
-    Route::delete('/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
-    Route::put('/{productId}' , [App\Http\Controllers\products::class , 'update']);
+    Route::get('/' , [App\Http\Controllers\products::class , 'index']);
 });
 
+//Route::middleware(['auth:api'])->group(function(){
+    Route::prefix('products')->group(function(){
+        Route::post('/' , [App\Http\Controllers\products::class , 'store']);
+        Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
+        Route::delete('/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
+        Route::put('/{productId}' , [App\Http\Controllers\products::class , 'update']);
+        Route::get('/myProducts/{userId}' , [App\Http\Controllers\products::class , 'myProducts']);
+    });
+//});

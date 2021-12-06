@@ -15,20 +15,21 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('productName');
             $table->string('description');
-            $table->string('expiryDate');
-            $table->integer('mainPrice');
+            $table->string('expireDate');
+            $table->integer('oldPrice');
             $table->string('imgUrl');
-            $table->integer('quantity');
+            $table->integer('quantity')->default(1);
             $table->string('category');
             $table->integer('ownerId');
-            $table->string('date1');
-            $table->integer('price1');
-            $table->string('date2');
-            $table->integer('price2');
-            $table->string('date3');
-            $table->integer('price3');
+            $table->string('dateOne');
+            $table->integer('priceOne');
+            $table->string('dateTwo');
+            $table->integer('priceTwo');
+            $table->string('dateThree');
+            $table->integer('priceThree');
+            $table->integer('seens')->default(0);
             $table->timestamps();
         });
     }
