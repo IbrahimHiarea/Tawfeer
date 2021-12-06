@@ -29,7 +29,7 @@ class CreateProductsTable extends Migration
             $table->integer('priceTwo');
             $table->string('dateThree');
             $table->integer('priceThree');
-            $table->integer('Seens')->default(0);
+            $table->integer('seens')->default(0);
             $table->timestamps();
         });
     }
