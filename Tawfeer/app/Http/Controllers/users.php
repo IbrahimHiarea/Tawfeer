@@ -19,10 +19,10 @@ class users extends Controller
 
         // make a conditions
         $valid = Validator::make($request->all() , [
-            'name' => ['required' , 'string' , 'max:25'] ,
+            'fullName' => ['required' , 'string' , 'max:25'] ,
             'email' => ['required' , 'string' , 'email' , 'max:50' , 'unique:users'],
-            'password' =>['required' , 'string' , 'min:7'],
-            'phone' => ['required'],
+            'password' => ['required' , 'string' , 'min:7'],
+            'phoneNumber' => ['required'],
         ]);
 
         //Handling The Errors
@@ -33,10 +33,10 @@ class users extends Controller
         //add new User
         $user = new User();
 
-        $user->name = $request->input('name');
+        $user->fullName = $request->input('fullName');
         $user->email = $request->input('email');
         $user->password = $request->input('password');
-        $user->phone = $request->input('phone');
+        $user->phoneNumber = $request->input('phoneNumber');
         $user->imgUrl = $request->input('imgUrl');
 
         $user->save();

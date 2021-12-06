@@ -12,18 +12,19 @@ class products extends Controller
     public function index(){
         // Get The Products by newest
         $product = Product::orderBy('created_at' , 'desc')->get([
-            'name' ,
+            'productName' ,
             'description' ,
-            'expiryDate' ,
-            'mainPrice' ,
+            'expireDate' ,
+            'oldPrice' ,
             'quantity' ,
-            'date1' ,
-            'price1' ,
-            'date2' ,
-            'price2' ,
-            'date3' ,
-            'price3',
-            'imgUrl'
+            'dateOne' ,
+            'priceOne' ,
+            'dateTwo' ,
+            'priceTwo' ,
+            'dateThree' ,
+            'priceThree',
+            'imgUrl' ,
+            'Seens'
         ]);
 
         // $curPrice = calcPrice()
@@ -39,10 +40,10 @@ class products extends Controller
     public function store(Request $request){
 
         $valid = Validator::make($request->all() , [
-            'name' => ['required' , 'string'],
+            'productName' => ['required' , 'string'],
             'description' => ['string'],
-            'expiryDate' => ['required'],
-            'mainPrice' => ['required'],
+            'expireDate' => ['required'],
+            'oldPrice' => ['required'],
             'quantity' => ['required'],
             'category' => ['required' , 'string'],
         ]);
@@ -53,21 +54,21 @@ class products extends Controller
 
         $product = new Product();
 
-        $product->name = $request->input('name');
+        $product->productName = $request->input('productName');
         $product->description = $request->input('description');
-        $product->expiryDate = $request->input('expiryDate');
-        $product->mainPrice = $request->input('mainPrice');
+        $product->expireDate = $request->input('expireDate');
+        $product->oldPrice = $request->input('oldPrice');
         $product->imgUrl = $request->input('imgUrl');
         $product->quantity = $request->input('quantity');
         $product->category = $request->input('category');
         // Don't Forget The Owner ID from the Token in the Header
         $product->ownerId = $request->header('ownerId');
-        $product->date1 = $request->input('date1');
-        $product->price1 = $request->input('price1');
-        $product->date2 = $request->input('date2');
-        $product->price2 = $request->input('price2');
-        $product->date3 = $request->input('date3');
-        $product->price3 = $request->input('price3');
+        $product->dateOne = $request->input('dateOne');
+        $product->priceOne = $request->input('priceOne');
+        $product->dateTwo = $request->input('dateTwo');
+        $product->priceTwo = $request->input('priceTwo');
+        $product->dateThree = $request->input('dateThree');
+        $product->priceThree = $request->input('priceThree');
 
         $product->save();
 
@@ -78,18 +79,19 @@ class products extends Controller
     public function show($productId){
         // Get The Product
         $product = Product::find($productId)->get([
-            'name' ,
+            'productName' ,
             'description' ,
-            'expiryDate' ,
-            'mainPrice' ,
+            'expireDate' ,
+            'oldPrice' ,
             'quantity' ,
-            'date1' ,
-            'price1' ,
-            'date2' ,
-            'price2' ,
-            'date3' ,
-            'price3',
-            'imgUrl'
+            'dateOne' ,
+            'priceOne' ,
+            'dateTwo' ,
+            'priceTwo' ,
+            'dateThree' ,
+            'priceThree',
+            'imgUrl' ,
+            'Seens'
         ]);
 
         // Handling Wrong ID
@@ -117,18 +119,19 @@ class products extends Controller
         $search = $request->input('search');
 
         $product = Product::where($searchBy , $search)->get([
-            'name' ,
+            'productName' ,
             'description' ,
-            'expiryDate' ,
-            'mainPrice' ,
+            'expireDate' ,
+            'oldPrice' ,
             'quantity' ,
-            'date1' ,
-            'price1' ,
-            'date2' ,
-            'price2' ,
-            'date3' ,
-            'price3',
-            'imgUrl'
+            'dateOne' ,
+            'priceOne' ,
+            'dateTwo' ,
+            'priceTwo' ,
+            'dateThree' ,
+            'priceThree',
+            'imgUrl' ,
+            'Seens'
         ]);
 
         $jsonContent = json_decode($product , true);
@@ -155,4 +158,11 @@ class products extends Controller
 
     }
 }
+
+// Image URL
+// Model Binding
+// Token
+// Login
+// What to send
+// Update
 
