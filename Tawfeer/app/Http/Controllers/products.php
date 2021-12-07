@@ -145,18 +145,18 @@ class products extends Controller
             return response()->json($valid->errors()->all());
 
         $product = Product::find($productId);
-        $product->productName = !empty($request->productName) ?$request->productName : $product->productName;
-        $product->description = !empty($request->description) ?$request->description : $product->description;
-        $product->oldPrice = !empty($request->oldPrice) ?$request->oldPrice : $product->oldPrice;
-        $product->imgUrl = !empty($request->imgUrl) ?$request->imgUrl : $product->imgUrl;
-        $product->quantity = !empty($request->quantity) ?$request->quantity : $product->quantity;
-        $product->category = !empty($request->category) ?$request->category : $product->category;
-        $product->dateOne = !empty($request->dateOne) ?$request->dateOne : $product->dateOne;
-        $product->priceOne = !empty($request->priceOne) ?$request->priceOne : $product->priceOne;
-        $product->dateTwo = !empty($request->dateTwo) ?$request->dateTwo : $product->dateTwo;
-        $product->priceTwo = !empty($request->priceTwo) ?$request->priceTwo : $product->priceTwo;
-        $product->dateThree = !empty($request->dateThree) ?$request->dateThree : $product->dateThree;
-        $product->priceThree = !empty($request->priceThree) ?$request->priceThree : $product->priceThree;
+        $product->productName = !empty($request->productName) ? $request->productName : $product->productName;
+        $product->description = !empty($request->description) ? $request->description : $product->description;
+        $product->oldPrice = !empty($request->oldPrice) ? $request->oldPrice : $product->oldPrice;
+        $product->imgUrl = !empty($request->imgUrl) ? $request->imgUrl : $product->imgUrl;
+        $product->quantity = !empty($request->quantity) ? $request->quantity : $product->quantity;
+        $product->category = !empty($request->category) ? $request->category : $product->category;
+        $product->dateOne = !empty($request->dateOne) ? $request->dateOne : $product->dateOne;
+        $product->priceOne = !empty($request->priceOne) ? $request->priceOne : $product->priceOne;
+        $product->dateTwo = !empty($request->dateTwo) ? $request->dateTwo : $product->dateTwo;
+        $product->priceTwo = !empty($request->priceTwo) ? $request->priceTwo : $product->priceTwo;
+        $product->dateThree = !empty($request->dateThree) ? $request->dateThree : $product->dateThree;
+        $product->priceThree = !empty($request->priceThree) ? $request->priceThree : $product->priceThree;
         $product->save();
 
         return response()->json(['message' => 'The Product Has Been Edit Successfully']);
