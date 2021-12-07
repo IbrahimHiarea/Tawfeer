@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class products extends Controller
 {
-
+    // Show All Products
     public function index(){
         // Get The Products by newest
         $product = Product::orderBy('created_at' , 'desc')->get([
@@ -35,7 +35,7 @@ class products extends Controller
             'Products' => $jsonContent
         ]);
     }
-
+    // Store new Product
     public function store(Request $request){
         //The validation
         $valid = Validator::make($request->all() , [
@@ -72,6 +72,8 @@ class products extends Controller
 
 
     public function show($productId){
+        if(!Product::where('id',$productId)->exists())
+            return response()->json(['message' => 'Invalid ID'],404);
         // Handling the Seen
         // Don't Forget to get the userId from the Token
         $this->seen($productId , 1);
@@ -142,30 +144,20 @@ class products extends Controller
         if($valid->fails())
             return response()->json($valid->errors()->all());
 
-        $productName = $request->input('productName');
-        if(!empty($productName))    Product::where('id',$productId)->update(['productName' => $productName]);
-        $description = $request->input('description');
-        if(!empty($description))  Product::where('id',$productId)->update(['description' => $description]);
-        $oldPrice = $request->input('oldPrice');
-        if(!empty($oldPrice))     Product::where('id',$productId)->update(['oldPrice' => $oldPrice]);
-        $imgUrl = $request->input('imgUrl');
-        if(!empty($imgUrl))   Product::where('id',$productId)->update(['imgUrl' => $imgUrl]);
-        $quantity = $request->input('quantity');
-        if(!empty($quantity)) Product::where('id',$productId)->update(['quantity' => $quantity]);
-        $category = $request->input('category');
-        if(!empty($category)) Product::where('id',$productId)->update(['category' => $category]);
-        $dateOne = $request->input('dateOne');
-        if(!empty($dateOne))  Product::where('id',$productId)->update(['dateOne' => $dateOne]);
-        $priceOne = $request->input('priceOne');
-        if(!empty($priceOne)) Product::where('id',$productId)->update(['priceOne' => $priceOne]);
-        $dateTwo = $request->input('dateTwo');
-        if(!empty($dateTwo))  Product::where('id',$productId)->update(['dateTwo' => $dateTwo]);
-        $priceTwo = $request->input('priceTwo');
-        if(!empty($priceTwo)) Product::where('id',$productId)->update(['priceTwo' => $priceTwo]);
-        $dateThree = $request->input('dateThree');
-        if(!empty($dateThree))    Product::where('id',$productId)->update(['dateThree' => $dateThree]);
-        $priceThree = $request->input('priceThree');
-        if(!empty($priceThree))   Product::where('id',$productId)->update(['priceThree' => $priceThree]);
+        $product = Product::find($productId);
+        $product->productName = !empty($request->productName) ?$request->productName : $product->productName;
+        $product->description = !empty($request->description) ?$request->description : $product->description;
+        $product->oldPrice = !empty($request->oldPrice) ?$request->oldPrice : $product->oldPrice;
+        $product->imgUrl = !empty($request->imgUrl) ?$request->imgUrl : $product->imgUrl;
+        $product->quantity = !empty($request->quantity) ?$request->quantity : $product->quantity;
+        $product->category = !empty($request->category) ?$request->category : $product->category;
+        $product->dateOne = !empty($request->dateOne) ?$request->dateOne : $product->dateOne;
+        $product->priceOne = !empty($request->priceOne) ?$request->priceOne : $product->priceOne;
+        $product->dateTwo = !empty($request->dateTwo) ?$request->dateTwo : $product->dateTwo;
+        $product->priceTwo = !empty($request->priceTwo) ?$request->priceTwo : $product->priceTwo;
+        $product->dateThree = !empty($request->dateThree) ?$request->dateThree : $product->dateThree;
+        $product->priceThree = !empty($request->priceThree) ?$request->priceThree : $product->priceThree;
+        $product->save();
 
         return response()->json(['message' => 'The Product Has Been Edit Successfully']);
     }
@@ -200,4 +192,3 @@ class products extends Controller
 // Token
 // Login
 // What to send
-
