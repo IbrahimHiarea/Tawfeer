@@ -28,12 +28,12 @@ Route::prefix('products')->group(function(){
     Route::get('/' , [App\Http\Controllers\products::class , 'index']);
 });
 
-//Route::middleware(['auth:api'])->group(function(){
+Route::middleware(['auth:api'])->group(function(){
     Route::prefix('products')->group(function(){
         Route::post('/' , [App\Http\Controllers\products::class , 'store']);
+        Route::get('/myProducts' , [App\Http\Controllers\products::class , 'myProducts']);
         Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
         Route::delete('/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
         Route::put('/{productId}' , [App\Http\Controllers\products::class , 'update']);
-        Route::get('/myProducts/{userId}' , [App\Http\Controllers\products::class , 'myProducts']);
     });
-//});
+});
