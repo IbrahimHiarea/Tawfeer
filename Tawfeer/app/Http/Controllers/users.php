@@ -57,4 +57,21 @@ class users extends Controller
 
         return response()->json(['message' => 'Logged in successfully' , 'token' => $token],200);
     }
+
+    public function profile(){
+        // Get the info of user
+        $userData = auth()->user();
+
+        $jsonContent = json_decode($userData , true);
+        return response()->json([
+            'user info' => $jsonContent
+        ]);
+    }
+
+    public function logout(){
+        // delete the Token
+        auth()->logout();
+
+        return response()->json(['message' => 'User logged out']);
+    }
 }

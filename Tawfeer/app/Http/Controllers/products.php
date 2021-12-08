@@ -18,12 +18,12 @@ class products extends Controller
             'expireDate',
             'oldPrice',
             'quantity',
-            'dateOne',
-            'priceOne',
-            'dateTwo',
-            'priceTwo',
-            'dateThree',
-            'priceThree',
+            'firstDate',
+            'firstDiscount',
+            'secondDate',
+            'secondDiscount',
+            'thirdDate',
+            'thirdDiscount',
             'imgUrl',
             'ownerId',
             'seens'
@@ -60,12 +60,12 @@ class products extends Controller
         $product->quantity = $request->input('quantity');
         $product->category = $request->input('category');
         $product->ownerId = auth()->user()->id;
-        $product->dateOne = $request->input('dateOne');
-        $product->priceOne = $request->input('priceOne');
-        $product->dateTwo = $request->input('dateTwo');
-        $product->priceTwo = $request->input('priceTwo');
-        $product->dateThree = $request->input('dateThree');
-        $product->priceThree = $request->input('priceThree');
+        $product->firstDate = $request->input('firstDate');
+        $product->firstDiscount = $request->input('firstDiscount');
+        $product->secondDate = $request->input('secondDate');
+        $product->secondDiscount = $request->input('secondDiscount');
+        $product->thirdDate = $request->input('thirdDate');
+        $product->thirdDiscount = $request->input('thirdDiscount');
         $product->save();
 
         $seen = new Seen();
@@ -92,12 +92,12 @@ class products extends Controller
             'expireDate',
             'oldPrice',
             'quantity',
-            'dateOne',
-            'priceOne',
-            'dateTwo',
-            'priceTwo',
-            'dateThree',
-            'priceThree',
+            'firstDate',
+            'firstDiscount',
+            'secondDate',
+            'secondDiscount',
+            'thirdDate',
+            'thirdDiscount',
             'imgUrl',
             'ownerId',
             'seens'
@@ -178,12 +178,12 @@ class products extends Controller
         $product->imgUrl = !empty($request->imgUrl) ? $request->imgUrl : $product->imgUrl;
         $product->quantity = !empty($request->quantity) ? $request->quantity : $product->quantity;
         $product->category = !empty($request->category) ? $request->category : $product->category;
-        $product->dateOne = !empty($request->dateOne) ? $request->dateOne : $product->dateOne;
-        $product->priceOne = !empty($request->priceOne) ? $request->priceOne : $product->priceOne;
-        $product->dateTwo = !empty($request->dateTwo) ? $request->dateTwo : $product->dateTwo;
-        $product->priceTwo = !empty($request->priceTwo) ? $request->priceTwo : $product->priceTwo;
-        $product->dateThree = !empty($request->dateThree) ? $request->dateThree : $product->dateThree;
-        $product->priceThree = !empty($request->priceThree) ? $request->priceThree : $product->priceThree;
+        $product->firstDate = !empty($request->firstDate) ? $request->firstDate : $product->firstDate;
+        $product->firstDiscount = !empty($request->firstDiscount) ? $request->firstDiscount : $product->firstDiscount;
+        $product->secondDate = !empty($request->secondDate) ? $request->secondDate : $product->secondDate;
+        $product->secondDiscount = !empty($request->secondDiscount) ? $request->secondDiscount : $product->secondDiscount;
+        $product->thirdDate = !empty($request->thirdDate) ? $request->thirdDate : $product->thirdDate;
+        $product->thirdDiscount = !empty($request->thirdDiscount) ? $request->thirdDiscount : $product->thirdDiscount;
         $product->save();
 
         return response()->json(['message' => 'The Product Has Been Edit Successfully']);
@@ -197,12 +197,12 @@ class products extends Controller
             'expireDate',
             'oldPrice',
             'quantity',
-            'dateOne',
-            'priceOne',
-            'dateTwo',
-            'priceTwo',
-            'dateThree',
-            'priceThree',
+            'firstDate',
+            'firstDiscount',
+            'secondDate',
+            'secondDiscount',
+            'thirdDate',
+            'thirdDiscount',
             'imgUrl',
             'ownerId',
             'seens'

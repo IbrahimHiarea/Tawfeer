@@ -24,12 +24,16 @@ Route::prefix('auth')->group(function(){
     Route::post('login' , [App\Http\Controllers\users::class , 'login']);
 });
 
-Route::prefix('products')->group(function(){
-    Route::get('/' , [App\Http\Controllers\products::class , 'index']);
-});
 
 Route::middleware(['auth:api'])->group(function(){
+    // auth route
+    Route::prefix('auth')->group(function(){
+        Route::get('/profile' , [App\Http\Controllers\users::class , 'profile']);
+        Route::get('/logout' , [App\Http\Controllers\users::class , 'logout']);
+    });
+    // product Route
     Route::prefix('products')->group(function(){
+        Route::get('/' , [App\Http\Controllers\products::class , 'index']);
         Route::post('/' , [App\Http\Controllers\products::class , 'store']);
         Route::get('/myProducts' , [App\Http\Controllers\products::class , 'myProducts']);
         Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
