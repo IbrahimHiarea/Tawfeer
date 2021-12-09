@@ -20,32 +20,58 @@ class users extends Controller
         // make a conditions
         $valid = Validator::make($request->all() , [
             'fullName' => ['required' , 'string' , 'max:25'] ,
-            'email' => ['required' , 'string' , 'email' , 'max:50' , 'unique:users'],
+            'email' => ['required' , 'string' , 'email' , 'max:50' , Rule::unique('users' , 'email')],
             'password' => ['required' , 'string' , 'min:7'],
             'phoneNumber' => ['required'],
         ]);
-
         //Handling The Errors
         if($valid->fails()){
             return $valid->errors()->all();
         }
-
         //add new User
         $user = new User();
-
         $user->fullName = $request->input('fullName');
         $user->email = $request->input('email');
-        $user->password = $request->input('password');
+        $user->password =bcrypt($request->input('password'));
         $user->phoneNumber = $request->input('phoneNumber');
         $user->imgUrl = $request->input('imgUrl');
-
         $user->save();
 
-        return response()->json(['message' => 'Welcome :)'],200);
-        //Don't forget to return Token !!!
+        // Generate Token
+        $token = auth()->attempt(['email' => $request->email , 'password' => $request->password]);
+
+        return response()->json(['message' => 'Welcome :)' , 'token' => $token],200);
     }
 
     public function login(Request $request){
+        // make a conditions
+        $valid = Validator::make($request->all() , [
+            'email' => ['required' , 'email'],
+            'phoneNumber' => ['required'],
+        ]);
 
+        // verify user + Token
+        if(!$token = auth()->attempt(['email' => $request->email , 'password' => $request->password])){
+            return response()->json(['message' => 'Invalid email or password'] , 400);
+        }
+
+        return response()->json(['message' => 'Logged in successfully' , 'token' => $token],200);
+    }
+
+    public function profile(){
+        // Get the info of user
+        $userData = auth()->user();
+
+        $jsonContent = json_decode($userData , true);
+        return response()->json([
+            'user info' => $jsonContent
+        ]);
+    }
+
+    public function logout(){
+        // delete the Token
+        auth()->logout();
+
+        return response()->json(['message' => 'User logged out']);
     }
 }

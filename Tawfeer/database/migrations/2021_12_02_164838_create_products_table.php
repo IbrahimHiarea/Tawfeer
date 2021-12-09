@@ -16,19 +16,19 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('productName');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->string('expireDate');
             $table->integer('oldPrice');
             $table->string('imgUrl');
             $table->integer('quantity')->default(1);
             $table->string('category');
             $table->integer('ownerId');
-            $table->string('dateOne');
-            $table->integer('priceOne');
-            $table->string('dateTwo');
-            $table->integer('priceTwo');
-            $table->string('dateThree');
-            $table->integer('priceThree');
+            $table->string('firstDate');
+            $table->integer('firstDiscount');
+            $table->string('secondDate');
+            $table->integer('secondDiscount');
+            $table->string('thirdDate');
+            $table->integer('thirdDiscount');
             $table->integer('seens')->default(0);
             $table->timestamps();
         });
