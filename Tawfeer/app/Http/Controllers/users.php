@@ -47,7 +47,7 @@ class users extends Controller
         // make a conditions
         $valid = Validator::make($request->all() , [
             'email' => ['required' , 'email'],
-            'phoneNumber' => ['required'],
+            'passwords' => ['required'],
         ]);
 
         // verify user + Token
