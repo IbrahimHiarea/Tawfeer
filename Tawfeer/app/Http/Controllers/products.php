@@ -58,6 +58,7 @@ class products extends Controller
             'firstDate' => ['date' , 'after:today'],
             'secondDate' => ['date' , 'after:firstDate'],
             'thirdDate' => ['date' , 'after:secondDate'],
+            'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
             return response()->json($valid->errors()->all());
@@ -69,7 +70,17 @@ class products extends Controller
         $product->expireDate = $request->input('expireDate');
         $product->oldPrice = $request->input('oldPrice');
         $product->currentPrice = $request->input('oldPrice');
-        $product->imgUrl = $request->input('imgUrl');
+        if($request->hasFile('img')){
+            //get the image
+            $img = $request->file('img');
+            //image Name
+            $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
+            //store the img in public folder
+            $img->move(public_path('storage/app/public/img'),$imgName);
+            $product->imgUrl = "storage/app/public/img/$imgName";
+        }
+//        else
+//            $product->imgUrl = "storage/app/public/img/default-product.png";
         $product->quantity = $request->input('quantity');
         $name = $request->input('category');
         if(!Category::where('name',$name)->exists()){
@@ -206,8 +217,6 @@ class products extends Controller
             return response()->json(['My Products : ' => $jsonContent]);
     }
 }
-
-// Image URL
 
 
 //[

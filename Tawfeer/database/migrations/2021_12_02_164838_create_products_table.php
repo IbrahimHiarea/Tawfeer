@@ -20,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->date('expireDate');
             $table->integer('oldPrice');
             $table->integer('currentPrice');
-            $table->text('imgUrl');
+            $table->text('imgUrl')->default('storage/app/public/img/default-product.png');
             $table->integer('quantity')->default(1);
             $table->foreignId('categoryId');//->constrained('categories');
             $table->foreignId('ownerId');//->constrained('users');
