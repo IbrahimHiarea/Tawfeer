@@ -2,33 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Seen;
 use Illuminate\Support\Facades\Validator;
+use function PHPUnit\Framework\isEmpty;
 
 class products extends Controller
 {
     // Show All Products
     public function index(){
         // Get The Products by newest
-        $product = Product::orderBy('created_at' , 'desc')->get([
-            'productName',
-            'description',
-            'expireDate',
-            'oldPrice',
-            'quantity',
-            'firstDate',
-            'firstDiscount',
-            'secondDate',
-            'secondDiscount',
-            'thirdDate',
-            'thirdDiscount',
-            'imgUrl',
-            'ownerId',
-            'seens'
-        ]);
-        // $curPrice = calcPrice()
+        $product = Product::orderBy('created_at' , 'desc')->get();
+        //calc price
+        foreach ($product as $array){
+            $currentDate = date('Y-m-d');
+            $currentDate = date('Y-m-d', strtotime($currentDate));
+
+            if($currentDate < $array->firstDate){
+                $array->currentPrice = $array->oldPrice;
+            }
+            else if($currentDate >= $array->thirdDate  &&  $currentDate < $array->expireDate){
+                $array->currentPrice = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
+            }
+            else if($currentDate >= $array->secondDate  &&  $currentDate < $array->thirdDate){
+                $array->currentPrice = $array->oldPrice - (($array->secondDiscount/100)*$array->oldPrice);
+            }
+            else if($currentDate >= $array->firstDate  &&  $currentDate < $array->secondDate){
+                $array->currentPrice = $array->oldPrice - (($array->firstDiscount/100)*$array->oldPrice);
+            }
+            else{
+                $product = Product::find($array->id);
+                $product->delete();
+            }
+        }
+        $product = Product::orderBy('created_at' , 'desc')->get();
         $jsonContent = json_decode($product , true);
         return response()->json([
             'message' => "The List Of Product : ",
@@ -46,6 +55,9 @@ class products extends Controller
             'oldPrice' => ['required'],
             'quantity' => ['required'],
             'category' => ['required' , 'string'],
+            'firstDate' => ['date' , 'after:today'],
+            'secondDate' => ['date' , 'after:firstDate'],
+            'thirdDate' => ['date' , 'after:secondDate'],
         ]);
         if($valid->fails())
             return response()->json($valid->errors()->all());
@@ -56,9 +68,21 @@ class products extends Controller
         $product->description = $request->input('description');
         $product->expireDate = $request->input('expireDate');
         $product->oldPrice = $request->input('oldPrice');
+        $product->currentPrice = $request->input('oldPrice');
         $product->imgUrl = $request->input('imgUrl');
         $product->quantity = $request->input('quantity');
-        $product->category = $request->input('category');
+        $name = $request->input('category');
+        if(!Category::where('name',$name)->exists()){
+            $category = new Category();
+            $category->name = $name;
+            $category->save();
+            $product->categoryId = $category->id;
+        }
+        else{
+            $category = Category::where('name',$name)->get();
+            $jasonCategory = json_decode($category,true);
+            $product->categoryId = $jasonCategory[0]['id'];
+        }
         $product->ownerId = auth()->user()->id;
         $product->firstDate = $request->input('firstDate');
         $product->firstDiscount = $request->input('firstDiscount');
@@ -86,22 +110,7 @@ class products extends Controller
         $this->seen($productId , $userId); // call seen Function
 
         // Get The Product
-        $product = Product::where('id',$productId)->get([
-            'productName',
-            'description',
-            'expireDate',
-            'oldPrice',
-            'quantity',
-            'firstDate',
-            'firstDiscount',
-            'secondDate',
-            'secondDiscount',
-            'thirdDate',
-            'thirdDiscount',
-            'imgUrl',
-            'ownerId',
-            'seens'
-        ]);
+        $product = Product::where('id',$productId)->get();
         $jsonContent = json_decode($product , true);
         return response()->json([
             "Products" => $jsonContent
@@ -140,8 +149,6 @@ class products extends Controller
 
         // Get the product where the id is equal to productId
         $product = Product::find($productId);
-        if(!$product)
-            return response()->json(['message' => 'Invalid ID']);
 
         // check if the user has this product
         $userId = auth()->user()->id;
@@ -191,22 +198,7 @@ class products extends Controller
 
     public function myProducts(){
         $userId = auth()->user()->id;
-        $product = Product::where('ownerId',$userId)->get([
-            'productName',
-            'description',
-            'expireDate',
-            'oldPrice',
-            'quantity',
-            'firstDate',
-            'firstDiscount',
-            'secondDate',
-            'secondDiscount',
-            'thirdDate',
-            'thirdDiscount',
-            'imgUrl',
-            'ownerId',
-            'seens'
-        ]);
+        $product = Product::where('ownerId',$userId)->get();
         $jsonContent = json_decode($product , true);
         if(!$jsonContent)
             return response()->json(['message' => 'Sorry , You Dont Have Any Products']);
@@ -216,5 +208,21 @@ class products extends Controller
 }
 
 // Image URL
-// Model Binding
-// What to send
+
+
+//[
+//    'productName',
+//    'description',
+//    'expireDate',
+//    'oldPrice',
+//    'quantity',
+//    'firstDate',
+//    'firstDiscount',
+//    'secondDate',
+//    'secondDiscount',
+//    'thirdDate',
+//    'thirdDiscount',
+//    'imgUrl',
+//    'ownerId',
+//    'seens'
+//]
