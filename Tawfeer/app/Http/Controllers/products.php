@@ -19,22 +19,23 @@ class products extends Controller
         foreach ($product as $array){
             $currentDate = date('Y-m-d');
             $currentDate = date('Y-m-d', strtotime($currentDate));
-
+            $discount = array(
+                $array->firstDate => $array->firstDiscount,
+                $array->secondDate => $array->secondDiscount,
+                $array->thirdDate => $array->thirdDiscount
+            );
+            $time = array($array->firstDate , $array->secondDate , $array->thirdDate);
+            rsort($time);
+            foreach ($time as $date){
+                if($currentDate >= $date){
+                    $price = $array->oldPrice - (($discount[$date]/100)*$array->oldPrice);
+                    Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+                    break;
+                }
+            }
             if($currentDate >= $array->expireDate){
                 $product = Product::find($array->id);
                 $product->delete();
-            }
-            else if($currentDate >= $array->thirdDate){
-                $price = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
-                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-            }
-            else if($currentDate >= $array->secondDate){
-                $price = $array->oldPrice - (($array->secondDiscount/100)*$array->oldPrice);
-                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-            }
-            else if($currentDate >= $array->firstDate){
-                $price = $array->oldPrice - (($array->firstDiscount/100)*$array->oldPrice);
-                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
             }
         }
         $product = Product::orderBy('created_at' , 'desc')->get();
@@ -122,7 +123,9 @@ class products extends Controller
         $this->seen($productId , $userId); // call seen Function
 
         // Get The Product
-        $product = Product::where('id',$productId)->get();
+//        $product = Product::where('id',$productId)->get();
+        $product = Product::find($productId);
+
         return response()->json([
             "Products" => $product
         ]);
@@ -266,5 +269,31 @@ class products extends Controller
 //chang imag ??
 
 
-//$price = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
-//Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+//if($currentDate >= $array->expireDate){
+//    $product = Product::find($array->id);
+//    $product->delete();
+//}
+//            if($currentDate >= $array->expireDate){
+//                $product = Product::find($array->id);
+//                $product->delete();
+//            }
+//            else if($currentDate >= $array->thirdDate){
+//                $price = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
+//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+//            }
+//            else if($currentDate >= $array->secondDate){
+//                $price = $array->oldPrice - (($array->secondDiscount/100)*$array->oldPrice);
+//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+//            }
+//            else if($currentDate >= $array->firstDate){
+//                $price = $array->oldPrice - (($array->firstDiscount/100)*$array->oldPrice);
+//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+//            }
+
+
+//$time = array(
+//    $product->firstDiscount => $product->firstDate ,
+//    $product->secondDiscount => $product->secondDate ,
+//    $product->thirdDiscount => $product->thirdDate
+//);
+//rsort($time);
