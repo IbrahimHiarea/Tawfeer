@@ -44,8 +44,6 @@ class users extends Controller
             $img->move(public_path('storage/app/public/img'),$imgName);
             $user->imgUrl = "storage/app/public/img/$imgName";
         }
-//        else
-//            $user->imgUrl = "storage/app/public/img/default-user.jpg";
         $user->save();
 
         // Generate Token

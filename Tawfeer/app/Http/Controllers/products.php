@@ -20,28 +20,27 @@ class products extends Controller
             $currentDate = date('Y-m-d');
             $currentDate = date('Y-m-d', strtotime($currentDate));
 
-            if($currentDate < $array->firstDate){
-                $array->currentPrice = $array->oldPrice;
-            }
-            else if($currentDate >= $array->thirdDate  &&  $currentDate < $array->expireDate){
-                $array->currentPrice = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
-            }
-            else if($currentDate >= $array->secondDate  &&  $currentDate < $array->thirdDate){
-                $array->currentPrice = $array->oldPrice - (($array->secondDiscount/100)*$array->oldPrice);
-            }
-            else if($currentDate >= $array->firstDate  &&  $currentDate < $array->secondDate){
-                $array->currentPrice = $array->oldPrice - (($array->firstDiscount/100)*$array->oldPrice);
-            }
-            else{
+            if($currentDate >= $array->expireDate){
                 $product = Product::find($array->id);
                 $product->delete();
             }
+            else if($currentDate >= $array->thirdDate){
+                $price = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
+                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+            }
+            else if($currentDate >= $array->secondDate){
+                $price = $array->oldPrice - (($array->secondDiscount/100)*$array->oldPrice);
+                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+            }
+            else if($currentDate >= $array->firstDate){
+                $price = $array->oldPrice - (($array->firstDiscount/100)*$array->oldPrice);
+                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+            }
         }
         $product = Product::orderBy('created_at' , 'desc')->get();
-        $jsonContent = json_decode($product , true);
         return response()->json([
             'message' => "The List Of Product : ",
-            'Products' => $jsonContent
+            'Products' => $product
         ]);
     }
 
@@ -55,9 +54,9 @@ class products extends Controller
             'oldPrice' => ['required'],
             'quantity' => ['required'],
             'category' => ['required' , 'string'],
-            'firstDate' => ['date' , 'after:today'],
-            'secondDate' => ['date' , 'after:firstDate'],
-            'thirdDate' => ['date' , 'after:secondDate'],
+            'firstDate' => ['date' /*, 'after:today'*/],
+            'secondDate' => ['date' /*, 'after:firstDate'*/],
+            'thirdDate' => ['date' /*, 'after:secondDate'*/],
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
@@ -70,18 +69,15 @@ class products extends Controller
         $product->expireDate = $request->input('expireDate');
         $product->oldPrice = $request->input('oldPrice');
         $product->currentPrice = $request->input('oldPrice');
-        if($request->hasFile('img')){
-            //get the image
-            $img = $request->file('img');
-            //image Name
-            $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
-            //store the img in public folder
-            $img->move(public_path('storage/app/public/img'),$imgName);
-            $product->imgUrl = "storage/app/public/img/$imgName";
-        }
-//        else
-//            $product->imgUrl = "storage/app/public/img/default-product.png";
         $product->quantity = $request->input('quantity');
+        $product->ownerId = auth()->user()->id;
+        $product->firstDate = $request->input('firstDate');
+        $product->firstDiscount = $request->input('firstDiscount');
+        $product->secondDate = $request->input('secondDate');
+        $product->secondDiscount = $request->input('secondDiscount');
+        $product->thirdDate = $request->input('thirdDate');
+        $product->thirdDiscount = $request->input('thirdDiscount');
+        // Handling the Category
         $name = $request->input('category');
         if(!Category::where('name',$name)->exists()){
             $category = new Category();
@@ -94,15 +90,19 @@ class products extends Controller
             $jasonCategory = json_decode($category,true);
             $product->categoryId = $jasonCategory[0]['id'];
         }
-        $product->ownerId = auth()->user()->id;
-        $product->firstDate = $request->input('firstDate');
-        $product->firstDiscount = $request->input('firstDiscount');
-        $product->secondDate = $request->input('secondDate');
-        $product->secondDiscount = $request->input('secondDiscount');
-        $product->thirdDate = $request->input('thirdDate');
-        $product->thirdDiscount = $request->input('thirdDiscount');
+        // handling the image
+        if($request->hasFile('img')){
+            //get the image
+            $img = $request->file('img');
+            //image Name
+            $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
+            //store the img in public folder
+            $img->move(public_path('storage/app/public/img'),$imgName);
+            $product->imgUrl = "storage/app/public/img/$imgName";
+        }
         $product->save();
 
+        // Seen
         $seen = new Seen();
         $seen->productId = $product->id;
         $seen->userId = auth()->user()->id;
@@ -111,6 +111,7 @@ class products extends Controller
         return response()->json(['message' => 'The Product has benn added successfully'],200);
     }
 
+    // Show Product
     public function show($productId){
         // check if Wrong id
         if(!Product::where('id',$productId)->exists())
@@ -122,12 +123,12 @@ class products extends Controller
 
         // Get The Product
         $product = Product::where('id',$productId)->get();
-        $jsonContent = json_decode($product , true);
         return response()->json([
-            "Products" => $jsonContent
+            "Products" => $product
         ]);
     }
 
+    // calc the seen
     public function seen($productId , $userId){
         //Get the Product Views
         $seen = Seen::where('productId',$productId)->get();
@@ -142,9 +143,9 @@ class products extends Controller
         }
         if($flag){
             //Edit the Seen on the product table
-            $product = Product::where('id',$productId)->get();
-            $counter = $product[0]['seens'];
-            Product::where('id',$productId)->update(['seens' => $counter+1]);
+            $product = Product::find($productId);
+            $product->seens = $product->seens + 1;
+            $product->save();
             // store the seen
             $seen = new Seen();
             $seen->productId = $productId;
@@ -153,6 +154,7 @@ class products extends Controller
         }
     }
 
+    // delete product
     public function destroy($productId){
         // check if Wrong id
         if(!Product::where('id',$productId)->exists())
@@ -171,6 +173,7 @@ class products extends Controller
         return response()->json(['message' => 'The Product Has Been Delete successfully']);
     }
 
+    // update on product
     public function update(Request $request,$productId){
         // check if Wrong id
         if(!Product::where('id',$productId)->exists())
@@ -193,20 +196,45 @@ class products extends Controller
         $product->productName = !empty($request->productName) ? $request->productName : $product->productName;
         $product->description = !empty($request->description) ? $request->description : $product->description;
         $product->oldPrice = !empty($request->oldPrice) ? $request->oldPrice : $product->oldPrice;
-        $product->imgUrl = !empty($request->imgUrl) ? $request->imgUrl : $product->imgUrl;
         $product->quantity = !empty($request->quantity) ? $request->quantity : $product->quantity;
-        $product->category = !empty($request->category) ? $request->category : $product->category;
         $product->firstDate = !empty($request->firstDate) ? $request->firstDate : $product->firstDate;
         $product->firstDiscount = !empty($request->firstDiscount) ? $request->firstDiscount : $product->firstDiscount;
         $product->secondDate = !empty($request->secondDate) ? $request->secondDate : $product->secondDate;
         $product->secondDiscount = !empty($request->secondDiscount) ? $request->secondDiscount : $product->secondDiscount;
         $product->thirdDate = !empty($request->thirdDate) ? $request->thirdDate : $product->thirdDate;
         $product->thirdDiscount = !empty($request->thirdDiscount) ? $request->thirdDiscount : $product->thirdDiscount;
+        // Category
+        if(!empty($request->category)){
+            $name = $request->input('category');
+            if(!Category::where('name',$name)->exists()){
+                $category = new Category();
+                $category->name = $name;
+                $category->save();
+                $product->categoryId = $category->id;
+            }
+            else{
+                $category = Category::where('name',$name)->get();
+                $jasonCategory = json_decode($category,true);
+                $product->categoryId = $jasonCategory[0]['id'];
+            }
+        }
+        // Image
+        if($request->hasFile('img')){
+            //get the image
+            $img = $request->file('img');
+            //image Name
+            $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
+            //store the img in public folder
+            $img->move(public_path('storage/app/public/img'),$imgName);
+            $product->imgUrl = "storage/app/public/img/$imgName";
+        }
+
         $product->save();
 
         return response()->json(['message' => 'The Product Has Been Edit Successfully']);
     }
 
+    // show user product
     public function myProducts(){
         $userId = auth()->user()->id;
         $product = Product::where('ownerId',$userId)->get();
@@ -235,3 +263,8 @@ class products extends Controller
 //    'ownerId',
 //    'seens'
 //]
+//chang imag ??
+
+
+//$price = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
+//Product::where('id' , $array->id)->update(['currentPrice' => $price]);
