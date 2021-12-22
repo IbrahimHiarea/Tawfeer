@@ -23,6 +23,7 @@ class users extends Controller
             'email' => ['required' , 'string' , 'email' , 'max:50' , Rule::unique('users' , 'email')],
             'password' => ['required' , 'string' , 'min:7'],
             'phoneNumber' => ['required'],
+            'img' => ['mimes:jpg,png,jpeg'],
         ]);
         //Handling The Errors
         if($valid->fails()){
@@ -34,7 +35,15 @@ class users extends Controller
         $user->email = $request->input('email');
         $user->password =bcrypt($request->input('password'));
         $user->phoneNumber = $request->input('phoneNumber');
-        $user->imgUrl = $request->input('imgUrl');
+        if ($request->hasFile('img')){
+            //get the image
+            $img = $request->file('img');
+            //image Name
+            $imgName = time() . '-' . $user->fullName . '.' . $request->file('img')->extension();
+            //store the img in public folder
+            $img->move(public_path('storage/app/public/img'),$imgName);
+            $user->imgUrl = "storage/app/public/img/$imgName";
+        }
         $user->save();
 
         // Generate Token
@@ -47,7 +56,7 @@ class users extends Controller
         // make a conditions
         $valid = Validator::make($request->all() , [
             'email' => ['required' , 'email'],
-            'phoneNumber' => ['required'],
+            'passwords' => ['required'],
         ]);
 
         // verify user + Token

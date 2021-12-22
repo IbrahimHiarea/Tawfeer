@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('phoneNumber');
             // dont Forget the default img
-            $table->string('imgUrl');
+            $table->text('imgUrl')->default('storage/app/public/img/default-user.jpg');
             $table->rememberToken();
             $table->timestamps();
         });
