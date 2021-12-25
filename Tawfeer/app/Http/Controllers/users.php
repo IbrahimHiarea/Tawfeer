@@ -71,9 +71,8 @@ class users extends Controller
         // Get the info of user
         $userData = auth()->user();
 
-        $jsonContent = json_decode($userData , true);
         return response()->json([
-            'user info' => $jsonContent
+            'user info' => $userData
         ]);
     }
 

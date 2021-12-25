@@ -55,9 +55,9 @@ class products extends Controller
             'oldPrice' => ['required'],
             'quantity' => ['required'],
             'category' => ['required' , 'string'],
-            'firstDate' => ['date' /*, 'after:today'*/],
-            'secondDate' => ['date' /*, 'after:firstDate'*/],
-            'thirdDate' => ['date' /*, 'after:secondDate'*/],
+            'firstDate' => ['date'],
+            'secondDate' => ['date'],
+            'thirdDate' => ['date'],
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
@@ -88,9 +88,9 @@ class products extends Controller
         }
         else{
             $category = Category::where('name',$name)->get();
-            $jasonCategory = json_decode($category,true);
-            $product->categoryId = $jasonCategory[0]['id'];
+            $product->categoryId = $category[0]['id'];
         }
+        $product->category = $request->input('category');
         // handling the image
         if($request->hasFile('img')){
             //get the image
@@ -217,9 +217,9 @@ class products extends Controller
             }
             else{
                 $category = Category::where('name',$name)->get();
-                $jasonCategory = json_decode($category,true);
-                $product->categoryId = $jasonCategory[0]['id'];
+                $product->categoryId = $category[0]['id'];
             }
+            $product->category = $request->input('category');
         }
         // Image
         if($request->hasFile('img')){
@@ -241,11 +241,10 @@ class products extends Controller
     public function myProducts(){
         $userId = auth()->user()->id;
         $product = Product::where('ownerId',$userId)->get();
-        $jsonContent = json_decode($product , true);
-        if(!$jsonContent)
+        if(!isEmpty($product))
             return response()->json(['message' => 'Sorry , You Dont Have Any Products']);
         else
-            return response()->json(['My Products : ' => $jsonContent]);
+            return response()->json(['My Products : ' => $product]);
     }
 }
 
@@ -266,7 +265,6 @@ class products extends Controller
 //    'ownerId',
 //    'seens'
 //]
-//chang imag ??
 
 
 //if($currentDate >= $array->expireDate){
@@ -291,9 +289,4 @@ class products extends Controller
 //            }
 
 
-//$time = array(
-//    $product->firstDiscount => $product->firstDate ,
-//    $product->secondDiscount => $product->secondDate ,
-//    $product->thirdDiscount => $product->thirdDate
-//);
-//rsort($time);
+// forgin key in the product migration
