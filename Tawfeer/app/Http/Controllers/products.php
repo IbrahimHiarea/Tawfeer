@@ -288,5 +288,3 @@ class products extends Controller
 //                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
 //            }
 
-
-// forgin key in the product migration
