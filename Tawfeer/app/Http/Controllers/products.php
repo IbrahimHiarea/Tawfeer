@@ -42,7 +42,7 @@ class products extends Controller
         return response()->json([
             'message' => "The List Of Product : ",
             'Products' => $product
-        ]);
+        ],200);
     }
 
     // Store new Product
@@ -55,13 +55,13 @@ class products extends Controller
             'oldPrice' => ['required'],
             'quantity' => ['required'],
             'category' => ['required' , 'string'],
-            'firstDate' => ['date' /*, 'after:today'*/],
-            'secondDate' => ['date' /*, 'after:firstDate'*/],
-            'thirdDate' => ['date' /*, 'after:secondDate'*/],
+            'firstDate' => ['date'],
+            'secondDate' => ['date'],
+            'thirdDate' => ['date'],
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
-            return response()->json($valid->errors()->all());
+            return response()->json($valid->errors()->all(),400);
 
         //creat a new row in product table
         $product = new Product();
@@ -88,9 +88,9 @@ class products extends Controller
         }
         else{
             $category = Category::where('name',$name)->get();
-            $jasonCategory = json_decode($category,true);
-            $product->categoryId = $jasonCategory[0]['id'];
+            $product->categoryId = $category[0]['id'];
         }
+        $product->category = $request->input('category');
         // handling the image
         if($request->hasFile('img')){
             //get the image
@@ -116,7 +116,7 @@ class products extends Controller
     public function show($productId){
         // check if Wrong id
         if(!Product::where('id',$productId)->exists())
-            return response()->json(['message' => 'Invalid ID'],404);
+            return response()->json(['message' => 'Invalid ID'],400);
 
         // Handling the Seen
         $userId = auth()->user()->id;
@@ -128,7 +128,7 @@ class products extends Controller
 
         return response()->json([
             "Products" => $product
-        ]);
+        ],200);
     }
 
     // calc the seen
@@ -161,7 +161,7 @@ class products extends Controller
     public function destroy($productId){
         // check if Wrong id
         if(!Product::where('id',$productId)->exists())
-            return response()->json(['message' => 'Invalid ID'],404);
+            return response()->json(['message' => 'Invalid ID'],400);
 
         // Get the product where the id is equal to productId
         $product = Product::find($productId);
@@ -173,14 +173,14 @@ class products extends Controller
 
         // Delete it
         $product->delete();
-        return response()->json(['message' => 'The Product Has Been Delete successfully']);
+        return response()->json(['message' => 'The Product Has Been Delete successfully'],200);
     }
 
     // update on product
     public function update(Request $request,$productId){
         // check if Wrong id
         if(!Product::where('id',$productId)->exists())
-            return response()->json(['message' => 'Invalid ID'],404);
+            return response()->json(['message' => 'Invalid ID'],400);
 
         $valid = Validator::make($request->all() , [
             'productName' => ['string'],
@@ -188,7 +188,7 @@ class products extends Controller
             'category' => ['string'],
         ]);
         if($valid->fails())
-            return response()->json($valid->errors()->all());
+            return response()->json($valid->errors()->all(),400);
 
         $userId = auth()->user()->id;
         $product = Product::find($productId);
@@ -217,9 +217,9 @@ class products extends Controller
             }
             else{
                 $category = Category::where('name',$name)->get();
-                $jasonCategory = json_decode($category,true);
-                $product->categoryId = $jasonCategory[0]['id'];
+                $product->categoryId = $category[0]['id'];
             }
+            $product->category = $request->input('category');
         }
         // Image
         if($request->hasFile('img')){
@@ -234,18 +234,17 @@ class products extends Controller
 
         $product->save();
 
-        return response()->json(['message' => 'The Product Has Been Edit Successfully']);
+        return response()->json(['message' => 'The Product Has Been Edit Successfully'],200);
     }
 
     // show user product
     public function myProducts(){
         $userId = auth()->user()->id;
         $product = Product::where('ownerId',$userId)->get();
-        $jsonContent = json_decode($product , true);
-        if(!$jsonContent)
-            return response()->json(['message' => 'Sorry , You Dont Have Any Products']);
+        if(!isEmpty($product))
+            return response()->json(['message' => 'Sorry , You Dont Have Any Products'],200);
         else
-            return response()->json(['My Products : ' => $jsonContent]);
+            return response()->json(['My Products : ' => $product],200);
     }
 }
 
@@ -266,7 +265,6 @@ class products extends Controller
 //    'ownerId',
 //    'seens'
 //]
-//chang imag ??
 
 
 //if($currentDate >= $array->expireDate){
@@ -290,10 +288,3 @@ class products extends Controller
 //                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
 //            }
 
-
-//$time = array(
-//    $product->firstDiscount => $product->firstDate ,
-//    $product->secondDiscount => $product->secondDate ,
-//    $product->thirdDiscount => $product->thirdDate
-//);
-//rsort($time);

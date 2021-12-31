@@ -20,7 +20,6 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phoneNumber');
-            // dont Forget the default img
             $table->text('imgUrl')->default('storage/app/public/img/default-user.jpg');
             $table->rememberToken();
             $table->timestamps();

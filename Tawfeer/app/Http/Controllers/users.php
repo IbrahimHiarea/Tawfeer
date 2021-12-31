@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 
+use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -27,7 +28,7 @@ class users extends Controller
         ]);
         //Handling The Errors
         if($valid->fails()){
-            return $valid->errors()->all();
+            return response()->json($valid->errors()->all(),400);
         }
         //add new User
         $user = new User();
@@ -71,16 +72,15 @@ class users extends Controller
         // Get the info of user
         $userData = auth()->user();
 
-        $jsonContent = json_decode($userData , true);
         return response()->json([
-            'user info' => $jsonContent
-        ]);
+            'user info' => $userData
+        ],200);
     }
 
     public function logout(){
         // delete the Token
         auth()->logout();
 
-        return response()->json(['message' => 'User logged out']);
+        return response()->json(['message' => 'User logged out'],200);
     }
 }
