@@ -83,4 +83,16 @@ class users extends Controller
 
         return response()->json(['message' => 'User logged out'],200);
     }
+
+    public function checkToken(){
+        return response()->json(['message' => 'Welcome'],200);
+    }
+
+    public function getUser($userId){
+        if(!User::where('id',$userId)->exists())
+            return response()->json(['message' => 'Invalid ID'],400);
+
+        $user = User::find($userId);
+        return response()->json(['user' => $user]);
+    }
 }
