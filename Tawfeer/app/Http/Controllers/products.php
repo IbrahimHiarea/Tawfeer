@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Seen;
@@ -29,7 +30,7 @@ class products extends Controller
             foreach ($time as $date){
                 if($currentDate >= $date){
                     $price = $array->oldPrice - (($discount[$date]/100)*$array->oldPrice);
-                    Product::where('id' , $array->id)->update(['currentPrice' => $price]);
+                    Product::where('id' , $array->id)->update(['currentPrice' => $price , 'currentDiscount' => $discount[$date]]);
                     break;
                 }
             }
@@ -40,7 +41,6 @@ class products extends Controller
         }
         $product = Product::orderBy('created_at' , 'desc')->get();
         return response()->json([
-            'message' => "The List Of Product : ",
             'Products' => $product
         ],200);
     }

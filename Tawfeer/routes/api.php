@@ -30,6 +30,8 @@ Route::middleware(['auth:api'])->group(function(){
     Route::prefix('auth')->group(function(){
         Route::get('/profile' , [App\Http\Controllers\users::class , 'profile']);
         Route::get('/logout' , [App\Http\Controllers\users::class , 'logout']);
+        Route::get('/' , [App\Http\Controllers\users::class , 'checkToken']);
+        Route::get('/{userId}' , [App\Http\Controllers\users::class , 'getUser']);
     });
     // product Route
     Route::prefix('products')->group(function(){
