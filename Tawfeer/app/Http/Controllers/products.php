@@ -30,7 +30,7 @@ class products extends Controller
             foreach ($time as $date){
                 if($currentDate >= $date){
                     $price = $array->oldPrice - (($discount[$date]/100)*$array->oldPrice);
-                    Product::where('id' , $array->id)->update(['currentPrice' => $price , 'currentDiscount' => $discount[$date]]);
+                    Product::where('id' , $array->id)->update(['currentPrice' => $price , 'currentDiscount' => ($discount[$date] == null ? 0 : $discount[$date])]);
                     break;
                 }
             }
