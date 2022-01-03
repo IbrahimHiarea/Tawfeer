@@ -20,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->date('expireDate');
             $table->double('oldPrice');
             $table->double('currentPrice');
-            $table->double('currentDiscount')->default(0);
+            $table->double('currentDiscount')->nullable();
             $table->text('imgUrl')->nullable();
             $table->integer('quantity')->default(1);
             $table->string('category');

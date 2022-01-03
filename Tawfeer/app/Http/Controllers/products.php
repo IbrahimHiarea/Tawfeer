@@ -61,7 +61,7 @@ class products extends Controller
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
-            return response()->json(['message' => 'Wrong Form for image'],400);
+            return response()->json(['message' => 'Wrong form of image'],400);
 
         //creat a new row in product table
         $product = new Product();
@@ -70,6 +70,7 @@ class products extends Controller
         $product->expireDate = $request->input('expireDate');
         $product->oldPrice = $request->input('oldPrice');
         $product->currentPrice = $request->input('oldPrice');
+        $product->currentDiscount = 0;
         $product->quantity = $request->input('quantity');
         $product->ownerId = auth()->user()->id;
         $product->firstDate = $request->input('firstDate');
@@ -189,7 +190,7 @@ class products extends Controller
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
-            return response()->json(['message' => 'Wrong Form for image'],400);
+            return response()->json(['message' => 'Wrong form of image'],400);
 
         $userId = auth()->user()->id;
         $product = Product::find($productId);
