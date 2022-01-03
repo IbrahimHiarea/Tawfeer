@@ -51,7 +51,7 @@ class products extends Controller
         $valid = Validator::make($request->all() , [
             'productName' => ['required' , 'string'],
             'description' => ['string'],
-            'expireDate' => ['required'],
+            'expireDate' => ['required' , 'date'],
             'oldPrice' => ['required'],
             'quantity' => ['required'],
             'category' => ['required' , 'string'],
@@ -61,7 +61,7 @@ class products extends Controller
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
-            return response()->json($valid->errors()->all(),400);
+            return response()->json(['message' => 'Wrong Form for image'],400);
 
         //creat a new row in product table
         $product = new Product();
@@ -127,7 +127,7 @@ class products extends Controller
         $product = Product::find($productId);
 
         return response()->json([
-            "Products" => $product
+            "Product" => $product
         ],200);
     }
 
@@ -186,15 +186,17 @@ class products extends Controller
             'productName' => ['string'],
             'description' => ['string'],
             'category' => ['string'],
+            'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
-            return response()->json($valid->errors()->all(),400);
+            return response()->json(['message' => 'Wrong Form for image'],400);
 
         $userId = auth()->user()->id;
         $product = Product::find($productId);
         // check ig this user has this product
         if($userId != $product->ownerId)
             return response()->json(['message' => 'You cant update this product'] , 400);
+
 
         $product->productName = !empty($request->productName) ? $request->productName : $product->productName;
         $product->description = !empty($request->description) ? $request->description : $product->description;
@@ -231,7 +233,6 @@ class products extends Controller
             $img->move(public_path('storage/app/public/img'),$imgName);
             $product->imgUrl = "storage/app/public/img/$imgName";
         }
-
         $product->save();
 
         return response()->json(['message' => 'The Product Has Been Edit Successfully'],200);
@@ -241,10 +242,11 @@ class products extends Controller
     public function myProducts(){
         $userId = auth()->user()->id;
         $product = Product::where('ownerId',$userId)->get();
-        if(!isEmpty($product))
-            return response()->json(['message' => 'Sorry , You Dont Have Any Products'],200);
-        else
-            return response()->json(['My Products : ' => $product],200);
+//        if(!isEmpty($product))
+//            return response()->json(['message' => 'Sorry , You Dont Have Any Products'],200);
+//        else
+//            return response()->json(['My Products : ' => $product],200);
+        return response()->json(['My Products' => $product],200);
     }
 }
 
@@ -265,26 +267,3 @@ class products extends Controller
 //    'ownerId',
 //    'seens'
 //]
-
-
-//if($currentDate >= $array->expireDate){
-//    $product = Product::find($array->id);
-//    $product->delete();
-//}
-//            if($currentDate >= $array->expireDate){
-//                $product = Product::find($array->id);
-//                $product->delete();
-//            }
-//            else if($currentDate >= $array->thirdDate){
-//                $price = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
-//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-//            }
-//            else if($currentDate >= $array->secondDate){
-//                $price = $array->oldPrice - (($array->secondDiscount/100)*$array->oldPrice);
-//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-//            }
-//            else if($currentDate >= $array->firstDate){
-//                $price = $array->oldPrice - (($array->firstDiscount/100)*$array->oldPrice);
-//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-//            }
-

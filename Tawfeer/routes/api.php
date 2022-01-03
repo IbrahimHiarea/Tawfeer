@@ -40,6 +40,6 @@ Route::middleware(['auth:api'])->group(function(){
         Route::get('/myProducts' , [App\Http\Controllers\products::class , 'myProducts']);
         Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
         Route::delete('/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
-        Route::put('/{productId}' , [App\Http\Controllers\products::class , 'update']);
+        Route::post('/{productId}' , [App\Http\Controllers\products::class , 'update']);
     });
 });

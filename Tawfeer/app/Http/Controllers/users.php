@@ -28,7 +28,7 @@ class users extends Controller
         ]);
         //Handling The Errors
         if($valid->fails()){
-            return response()->json($valid->errors()->all(),400);
+            return response()->json(['message' => 'The email has already been taken'],400);
         }
         //add new User
         $user = new User();
@@ -50,7 +50,7 @@ class users extends Controller
         // Generate Token
         $token = auth()->attempt(['email' => $request->email , 'password' => $request->password]);
 
-        return response()->json(['message' => 'Welcome :)' , 'token' => $token],200);
+        return response()->json(['message' => 'Welcome :)' , 'token' => "bearer $token"],200);
     }
 
     public function login(Request $request){
@@ -65,16 +65,14 @@ class users extends Controller
             return response()->json(['message' => 'Invalid email or password'] , 400);
         }
 
-        return response()->json(['message' => 'Logged in successfully' , 'token' => $token],200);
+        return response()->json(['message' => 'Logged in successfully' , 'token' => "bearer $token"],200);
     }
 
     public function profile(){
         // Get the info of user
         $userData = auth()->user();
 
-        return response()->json([
-            'user info' => $userData
-        ],200);
+        return response()->json(['user info' => $userData],200);
     }
 
     public function logout(){
@@ -93,6 +91,6 @@ class users extends Controller
             return response()->json(['message' => 'Invalid ID'],400);
 
         $user = User::find($userId);
-        return response()->json(['user' => $user]);
+        return response()->json(['user' => $user],200);
     }
 }
