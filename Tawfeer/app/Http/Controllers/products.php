@@ -50,7 +50,6 @@ class products extends Controller
         //The validation
         $valid = Validator::make($request->all() , [
             'productName' => ['required' , 'string'],
-            'description' => ['string'],
             'expireDate' => ['required' , 'date'],
             'oldPrice' => ['required'],
             'quantity' => ['required'],
@@ -185,7 +184,6 @@ class products extends Controller
 
         $valid = Validator::make($request->all() , [
             'productName' => ['string'],
-            'description' => ['string'],
             'category' => ['string'],
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
