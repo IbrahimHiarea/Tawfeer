@@ -105,6 +105,7 @@ class users extends Controller
         $img->move(public_path('storage/app/public/img'),$imgName);
         $user->imgUrl = "storage/app/public/img/$imgName";
         $user->save();
+
         return response()->json(['message' => 'The photo has been updated'],200);
     }
 }

@@ -110,11 +110,6 @@ class products extends Controller
         $seen->productId = $product->id;
         $seen->userId = auth()->user()->id;
         $seen->save();
-        //like
-//        $comment = new Comment();
-//        $comment->productId = $product->id;
-//        $comment->userId = auth()->user()->id;
-//        $comment->save();
 
         return response()->json(['message' => 'The Product has benn added successfully'],200);
     }
@@ -130,12 +125,9 @@ class products extends Controller
         $this->seen($productId , $userId); // call seen Function
 
         // Get The Product
-//        $product = Product::where('id',$productId)->get();
         $product = Product::find($productId);
 
-        return response()->json([
-            "Product" => $product
-        ],200);
+        return response()->json(["Product" => $product],200);
     }
 
     // calc the seen
@@ -248,10 +240,7 @@ class products extends Controller
     public function myProducts(){
         $userId = auth()->user()->id;
         $product = Product::where('ownerId',$userId)->get();
-//        if(!isEmpty($product))
-//            return response()->json(['message' => 'Sorry , You Dont Have Any Products'],200);
-//        else
-//            return response()->json(['My Products : ' => $product],200);
+
         return response()->json(['My Products' => $product],200);
     }
 
@@ -303,21 +292,3 @@ class products extends Controller
         return response()->json(['comments' => $comments],200);
     }
 }
-
-
-//[
-//    'productName',
-//    'description',
-//    'expireDate',
-//    'oldPrice',
-//    'quantity',
-//    'firstDate',
-//    'firstDiscount',
-//    'secondDate',
-//    'secondDiscount',
-//    'thirdDate',
-//    'thirdDiscount',
-//    'imgUrl',
-//    'ownerId',
-//    'seens'
-//]
