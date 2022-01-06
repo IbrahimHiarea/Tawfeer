@@ -133,17 +133,7 @@ class products extends Controller
     // calc the seen
     public function seen($productId , $userId){
         //Get the Product Views
-        $seen = Seen::where('productId',$productId)->get();
-
-        $flag = true;
-        foreach ($seen as $seenArray){
-            //check if the user had seen the product before
-            if($seenArray->userId == $userId){
-                $flag = false;
-                break;
-            }
-        }
-        if($flag){
+        if(!(Seen::where(['userId' => $userId , 'productId' => $productId])->exists())){
             //Edit the Seen on the product table
             $product = Product::find($productId);
             $product->seens = $product->seens + 1;
@@ -247,47 +237,63 @@ class products extends Controller
     //Comment
     public function comment(Request $request , $productId){
         $userId = auth()->user()->id;
+        $user = \App\Models\User::find($userId);
 
         $comment = new Comment();
         $comment->userId = $userId;
         $comment->productId = $productId;
         $comment->comment = $request->input('comment');
-
+        $comment->userName = $user->fullName;
+        $comment->imgUrl = $user->imgUrl;
         $comment->save();
+
         return response()->json(['message' => 'Your commnet had benn added'],200);
     }
 
     //Likes
     public function like($productId){
-        //Get the Product Views
-        $like = Like::where('productId',$productId)->get();
+        //Get the Product Likes
         $userId = auth()->user()->id;
 
-        $flag = true;
-        foreach ($like as $likeArray){
-            //check if the user made like on the product before
-            if($likeArray->userId == $userId){
-                $flag = false;
-                break;
-            }
-        }
-        if($flag){
-            //Edit the like on the product table
-            $product = Product::find($productId);
-            $product->likes = $product->likes + 1;
-            $product->save();
-            // store the like
+        if(!(Like::where(['userId' => $userId , 'productId' => $productId])->exists())){
             $like = new Like();
             $like->productId = $productId;
             $like->userId = $userId;
             $like->save();
+
+            $product = Product::find($productId);
+            $product->likes = $product->likes + 1;
+            $product->save();
+
             return response()->json(['message' => 'The like had been added'],200);
+        }
+    }
+
+    //Dislike
+    public function dislike($productId){
+        $userId = auth()->user()->id;
+
+        if(Like::where(['userId' => $userId , 'productId' => $productId])->exists()){
+            $like = Like::where(['userId' => $userId , 'productId' => $productId]);
+            $like->delete();
+
+            $product = Product::find($productId);
+            $product->likes = $product->likes - 1;
+            $product->save();
+
+            return response()->json(['message' => 'Disliked'],200);
         }
     }
 
     //Show Comments
     public function showComments($productId){
         $comments = Comment::where('productId' , $productId)->get();
+
+        foreach ($comments as $array){
+            $user = \App\Models\User::find($array->userId);
+            Comment::where('id' , $array->id)->update(['imgUrl' => $user->imgUrl]);
+        }
+        $comments = Comment::orderBy('created_at' , 'desc')->get();
 
         return response()->json(['comments' => $comments],200);
     }
