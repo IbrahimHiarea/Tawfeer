@@ -32,6 +32,7 @@ Route::middleware(['auth:api'])->group(function(){
         Route::get('/logout' , [App\Http\Controllers\users::class , 'logout']);
         Route::get('/' , [App\Http\Controllers\users::class , 'checkToken']);
         Route::get('/{userId}' , [App\Http\Controllers\users::class , 'getUser']);
+        Route::post('/updatePhoto' , [App\Http\Controllers\users::class , 'updatePhoto']);
     });
     // product Route
     Route::prefix('products')->group(function(){
@@ -41,5 +42,8 @@ Route::middleware(['auth:api'])->group(function(){
         Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
         Route::delete('/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
         Route::post('/{productId}' , [App\Http\Controllers\products::class , 'update']);
+        Route::post('/addComment/{productId}' , [App\Http\Controllers\products::class , 'comment']);
+        Route::get('/like/{productId}', [App\Http\Controllers\products::class , 'like']);
+        Route::get('/getComments/{productId}' , [App\Http\Controllers\products::class , 'showComments']);
     });
 });

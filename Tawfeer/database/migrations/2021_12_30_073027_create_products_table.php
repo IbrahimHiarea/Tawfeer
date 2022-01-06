@@ -33,6 +33,7 @@ class CreateProductsTable extends Migration
             $table->date('thirdDate')->nullable();
             $table->double('thirdDiscount')->nullable();
             $table->integer('seens')->default(0);
+            $table->integer('likes')->default(0);
             $table->timestamps();
         });
     }

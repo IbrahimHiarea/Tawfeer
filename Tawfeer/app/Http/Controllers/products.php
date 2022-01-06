@@ -7,6 +7,8 @@ use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Seen;
+use App\Models\Comment;
+use App\Models\Like;
 use Illuminate\Support\Facades\Validator;
 use function PHPUnit\Framework\isEmpty;
 
@@ -108,6 +110,11 @@ class products extends Controller
         $seen->productId = $product->id;
         $seen->userId = auth()->user()->id;
         $seen->save();
+        //like
+//        $comment = new Comment();
+//        $comment->productId = $product->id;
+//        $comment->userId = auth()->user()->id;
+//        $comment->save();
 
         return response()->json(['message' => 'The Product has benn added successfully'],200);
     }
@@ -246,6 +253,54 @@ class products extends Controller
 //        else
 //            return response()->json(['My Products : ' => $product],200);
         return response()->json(['My Products' => $product],200);
+    }
+
+    //Comment
+    public function comment(Request $request , $productId){
+        $userId = auth()->user()->id;
+
+        $comment = new Comment();
+        $comment->userId = $userId;
+        $comment->productId = $productId;
+        $comment->comment = $request->input('comment');
+
+        $comment->save();
+        return response()->json(['message' => 'Your commnet had benn added'],200);
+    }
+
+    //Likes
+    public function like($productId){
+        //Get the Product Views
+        $like = Like::where('productId',$productId)->get();
+        $userId = auth()->user()->id;
+
+        $flag = true;
+        foreach ($like as $likeArray){
+            //check if the user made like on the product before
+            if($likeArray->userId == $userId){
+                $flag = false;
+                break;
+            }
+        }
+        if($flag){
+            //Edit the like on the product table
+            $product = Product::find($productId);
+            $product->likes = $product->likes + 1;
+            $product->save();
+            // store the like
+            $like = new Like();
+            $like->productId = $productId;
+            $like->userId = $userId;
+            $like->save();
+            return response()->json(['message' => 'The like had been added'],200);
+        }
+    }
+
+    //Show Comments
+    public function showComments($productId){
+        $comments = Comment::where('productId' , $productId)->get();
+
+        return response()->json(['comments' => $comments],200);
     }
 }
 
