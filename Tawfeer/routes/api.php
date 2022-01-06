@@ -44,6 +44,7 @@ Route::middleware(['auth:api'])->group(function(){
         Route::post('/{productId}' , [App\Http\Controllers\products::class , 'update']);
         Route::post('/addComment/{productId}' , [App\Http\Controllers\products::class , 'comment']);
         Route::get('/like/{productId}', [App\Http\Controllers\products::class , 'like']);
+        Route::get('/dislike/{productId}' , [App\Http\Controllers\products::class , 'dislike']);
         Route::get('/getComments/{productId}' , [App\Http\Controllers\products::class , 'showComments']);
     });
 });
