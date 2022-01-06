@@ -7,6 +7,8 @@ use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Seen;
+use App\Models\Comment;
+use App\Models\Like;
 use Illuminate\Support\Facades\Validator;
 use function PHPUnit\Framework\isEmpty;
 
@@ -30,7 +32,7 @@ class products extends Controller
             foreach ($time as $date){
                 if($currentDate >= $date){
                     $price = $array->oldPrice - (($discount[$date]/100)*$array->oldPrice);
-                    Product::where('id' , $array->id)->update(['currentPrice' => $price , 'currentDiscount' => $discount[$date]]);
+                    Product::where('id' , $array->id)->update(['currentPrice' => $price , 'currentDiscount' => ($discount[$date] == null ? 0 : $discount[$date])]);
                     break;
                 }
             }
@@ -50,8 +52,7 @@ class products extends Controller
         //The validation
         $valid = Validator::make($request->all() , [
             'productName' => ['required' , 'string'],
-            'description' => ['string'],
-            'expireDate' => ['required'],
+            'expireDate' => ['required' , 'date'],
             'oldPrice' => ['required'],
             'quantity' => ['required'],
             'category' => ['required' , 'string'],
@@ -61,7 +62,7 @@ class products extends Controller
             'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
-            return response()->json($valid->errors()->all(),400);
+            return response()->json(['message' => 'Wrong form of image'],400);
 
         //creat a new row in product table
         $product = new Product();
@@ -70,6 +71,7 @@ class products extends Controller
         $product->expireDate = $request->input('expireDate');
         $product->oldPrice = $request->input('oldPrice');
         $product->currentPrice = $request->input('oldPrice');
+        $product->currentDiscount = 0;
         $product->quantity = $request->input('quantity');
         $product->ownerId = auth()->user()->id;
         $product->firstDate = $request->input('firstDate');
@@ -123,12 +125,9 @@ class products extends Controller
         $this->seen($productId , $userId); // call seen Function
 
         // Get The Product
-//        $product = Product::where('id',$productId)->get();
         $product = Product::find($productId);
 
-        return response()->json([
-            "Products" => $product
-        ],200);
+        return response()->json(["Product" => $product],200);
     }
 
     // calc the seen
@@ -184,17 +183,18 @@ class products extends Controller
 
         $valid = Validator::make($request->all() , [
             'productName' => ['string'],
-            'description' => ['string'],
             'category' => ['string'],
+            'img' => ['mimes:jpg,png,jpeg'],
         ]);
         if($valid->fails())
-            return response()->json($valid->errors()->all(),400);
+            return response()->json(['message' => 'Wrong form of image'],400);
 
         $userId = auth()->user()->id;
         $product = Product::find($productId);
         // check ig this user has this product
         if($userId != $product->ownerId)
             return response()->json(['message' => 'You cant update this product'] , 400);
+
 
         $product->productName = !empty($request->productName) ? $request->productName : $product->productName;
         $product->description = !empty($request->description) ? $request->description : $product->description;
@@ -231,7 +231,6 @@ class products extends Controller
             $img->move(public_path('storage/app/public/img'),$imgName);
             $product->imgUrl = "storage/app/public/img/$imgName";
         }
-
         $product->save();
 
         return response()->json(['message' => 'The Product Has Been Edit Successfully'],200);
@@ -241,50 +240,55 @@ class products extends Controller
     public function myProducts(){
         $userId = auth()->user()->id;
         $product = Product::where('ownerId',$userId)->get();
-        if(!isEmpty($product))
-            return response()->json(['message' => 'Sorry , You Dont Have Any Products'],200);
-        else
-            return response()->json(['My Products : ' => $product],200);
+
+        return response()->json(['My Products' => $product],200);
+    }
+
+    //Comment
+    public function comment(Request $request , $productId){
+        $userId = auth()->user()->id;
+
+        $comment = new Comment();
+        $comment->userId = $userId;
+        $comment->productId = $productId;
+        $comment->comment = $request->input('comment');
+
+        $comment->save();
+        return response()->json(['message' => 'Your commnet had benn added'],200);
+    }
+
+    //Likes
+    public function like($productId){
+        //Get the Product Views
+        $like = Like::where('productId',$productId)->get();
+        $userId = auth()->user()->id;
+
+        $flag = true;
+        foreach ($like as $likeArray){
+            //check if the user made like on the product before
+            if($likeArray->userId == $userId){
+                $flag = false;
+                break;
+            }
+        }
+        if($flag){
+            //Edit the like on the product table
+            $product = Product::find($productId);
+            $product->likes = $product->likes + 1;
+            $product->save();
+            // store the like
+            $like = new Like();
+            $like->productId = $productId;
+            $like->userId = $userId;
+            $like->save();
+            return response()->json(['message' => 'The like had been added'],200);
+        }
+    }
+
+    //Show Comments
+    public function showComments($productId){
+        $comments = Comment::where('productId' , $productId)->get();
+
+        return response()->json(['comments' => $comments],200);
     }
 }
-
-
-//[
-//    'productName',
-//    'description',
-//    'expireDate',
-//    'oldPrice',
-//    'quantity',
-//    'firstDate',
-//    'firstDiscount',
-//    'secondDate',
-//    'secondDiscount',
-//    'thirdDate',
-//    'thirdDiscount',
-//    'imgUrl',
-//    'ownerId',
-//    'seens'
-//]
-
-
-//if($currentDate >= $array->expireDate){
-//    $product = Product::find($array->id);
-//    $product->delete();
-//}
-//            if($currentDate >= $array->expireDate){
-//                $product = Product::find($array->id);
-//                $product->delete();
-//            }
-//            else if($currentDate >= $array->thirdDate){
-//                $price = $array->oldPrice - (($array->thirdDiscount/100)*$array->oldPrice);
-//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-//            }
-//            else if($currentDate >= $array->secondDate){
-//                $price = $array->oldPrice - (($array->secondDiscount/100)*$array->oldPrice);
-//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-//            }
-//            else if($currentDate >= $array->firstDate){
-//                $price = $array->oldPrice - (($array->firstDiscount/100)*$array->oldPrice);
-//                Product::where('id' , $array->id)->update(['currentPrice' => $price]);
-//            }
-

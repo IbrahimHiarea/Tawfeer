@@ -16,11 +16,11 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('productName');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->date('expireDate');
             $table->double('oldPrice');
             $table->double('currentPrice');
-            $table->double('currentDiscount')->default(0);
+            $table->double('currentDiscount')->nullable();
             $table->text('imgUrl')->nullable();
             $table->integer('quantity')->default(1);
             $table->string('category');
@@ -33,6 +33,7 @@ class CreateProductsTable extends Migration
             $table->date('thirdDate')->nullable();
             $table->double('thirdDiscount')->nullable();
             $table->integer('seens')->default(0);
+            $table->integer('likes')->default(0);
             $table->timestamps();
         });
     }
