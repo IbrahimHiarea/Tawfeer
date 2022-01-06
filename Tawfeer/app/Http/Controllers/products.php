@@ -247,13 +247,16 @@ class products extends Controller
     //Comment
     public function comment(Request $request , $productId){
         $userId = auth()->user()->id;
+        $user = \App\Models\User::find($userId);
 
         $comment = new Comment();
         $comment->userId = $userId;
         $comment->productId = $productId;
         $comment->comment = $request->input('comment');
-
+        $comment->userName = $user->fullName;
+        $comment->imgUrl = $user->imgUrl;
         $comment->save();
+
         return response()->json(['message' => 'Your commnet had benn added'],200);
     }
 
@@ -288,6 +291,12 @@ class products extends Controller
     //Show Comments
     public function showComments($productId){
         $comments = Comment::where('productId' , $productId)->get();
+
+        foreach ($comments as $array){
+            $user = \App\Models\User::find($array->userId);
+            Comment::where('id' , $array->id)->update(['imgUrl' => $user->imgUrl]);
+        }
+        $comments = Comment::orderBy('created_at' , 'desc')->get();
 
         return response()->json(['comments' => $comments],200);
     }
