@@ -127,7 +127,11 @@ class products extends Controller
         // Get The Product
         $product = Product::find($productId);
 
-        return response()->json(["Product" => $product],200);
+        $isLiked = false;
+        if(Like::where(["userId" => $userId , "productId" => $productId])->exists())
+            $isLiked = true;
+
+        return response()->json(["Product" => $product , "Liked" => $isLiked],200);
     }
 
     // calc the seen
@@ -293,7 +297,7 @@ class products extends Controller
             $user = \App\Models\User::find($array->userId);
             Comment::where('id' , $array->id)->update(['imgUrl' => $user->imgUrl]);
         }
-        $comments = Comment::orderBy('created_at' , 'desc')->get();
+        $comments = Comment::where('productId' , $productId)->orderBy('created_at' , 'desc')->get();
 
         return response()->json(['comments' => $comments],200);
     }
