@@ -100,8 +100,8 @@ class products extends Controller
             //image Name
             $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
             //store the img in public folder
-            $img->move(public_path('storage/app/public/img'),$imgName);
-            $product->imgUrl = "storage/app/public/img/$imgName";
+            $img->move('public_html/storage/app/public/img',$imgName);
+            $product->imgUrl = "public_html/storage/app/public/img/$imgName";
         }
         $product->save();
 
@@ -222,8 +222,8 @@ class products extends Controller
             //image Name
             $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
             //store the img in public folder
-            $img->move(public_path('storage/app/public/img'),$imgName);
-            $product->imgUrl = "storage/app/public/img/$imgName";
+            $img->move('public_html/storage/app/public/img',$imgName);
+            $product->imgUrl = "public_html/storage/app/public/img/$imgName";
         }
         $product->save();
 

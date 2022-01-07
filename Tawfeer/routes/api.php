@@ -37,11 +37,11 @@ Route::middleware(['auth:api'])->group(function(){
     // product Route
     Route::prefix('products')->group(function(){
         Route::get('/' , [App\Http\Controllers\products::class , 'index']);
-        Route::post('/' , [App\Http\Controllers\products::class , 'store']);
+        Route::post('/store' , [App\Http\Controllers\products::class , 'store']);
         Route::get('/myProducts' , [App\Http\Controllers\products::class , 'myProducts']);
         Route::get('/{productId}' , [App\Http\Controllers\products::class , 'show']);
-        Route::delete('/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
-        Route::post('/{productId}' , [App\Http\Controllers\products::class , 'update']);
+        Route::post('/delete/{productId}' , [App\Http\Controllers\products::class , 'destroy']);
+        Route::post('/update/{productId}' , [App\Http\Controllers\products::class , 'update']);
         Route::post('/addComment/{productId}' , [App\Http\Controllers\products::class , 'comment']);
         Route::get('/like/{productId}', [App\Http\Controllers\products::class , 'like']);
         Route::get('/dislike/{productId}' , [App\Http\Controllers\products::class , 'dislike']);
