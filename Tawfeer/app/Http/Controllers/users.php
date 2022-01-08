@@ -102,8 +102,8 @@ class users extends Controller
         //image Name
         $imgName = time() . '-' . $user->fullName . '.' . $request->file('img')->extension();
         //store the img in public folder
-        $img->move(public_path('storage/app/public/img'),$imgName);
-        $user->imgUrl = "storage/app/public/img/$imgName";
+        $img->move('public_html/storage/app/public/img',$imgName);
+        $user->imgUrl = "public_html/storage/app/public/img/$imgName";
         $user->save();
 
         return response()->json(['message' => 'The photo has been updated'],200);

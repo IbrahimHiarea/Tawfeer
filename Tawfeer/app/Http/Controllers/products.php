@@ -100,8 +100,8 @@ class products extends Controller
             //image Name
             $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
             //store the img in public folder
-            $img->move(public_path('storage/app/public/img'),$imgName);
-            $product->imgUrl = "storage/app/public/img/$imgName";
+            $img->move('public_html/storage/app/public/img',$imgName);
+            $product->imgUrl = "public_html/storage/app/public/img/$imgName";
         }
         $product->save();
 
@@ -222,8 +222,8 @@ class products extends Controller
             //image Name
             $imgName = time() . '-' . $product->productName . '.' . $request->file('img')->extension();
             //store the img in public folder
-            $img->move(public_path('storage/app/public/img'),$imgName);
-            $product->imgUrl = "storage/app/public/img/$imgName";
+            $img->move('public_html/storage/app/public/img',$imgName);
+            $product->imgUrl = "public_html/storage/app/public/img/$imgName";
         }
         $product->save();
 
@@ -302,3 +302,50 @@ class products extends Controller
         return response()->json(['comments' => $comments],200);
     }
 }
+
+
+
+//Search
+//public function search(Request $request){
+//    $valid = Validator::make($request->all() , [
+//        'name' => ['required'],
+//        'searchType' => ['required'],
+//    ]);
+//
+//    if($valid->fails()){
+//        return response()->json(['message' => $valid->errors()->all()],400);
+//    }
+//
+//    $name = $request->input('name');
+//    $searchType = $request->input('searchType');
+//
+//    if($searchType == 1){
+//        $product = Product::where('productName' , $name)->get();
+//        return response()->json(['products' => $product],200);
+//    }
+//    else if($searchType == 2){
+//        $product = Product::where('category' , $name)->get();
+//        return response()->json(['products' => $product],200);
+//    }
+//    else{
+//        $product = Product::where('expireDate' , $name)->get();
+//        return response()->json(['products' => $product],200);
+//    }
+//}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//sort
+//public function sort(Request $request){
+//    $valid = Validator::make($request->all() , [
+//        'sortType' =>['required'],
+//    ]);
+//
+//    if($valid->fails()){
+//        return response()->json(['message' => $valid->errors()->all()],400);
+//    }
+//
+//    $sort = $request->input('sortType');
+//    $product = Product::orderBy($sort , 'desc')->get();
+//    return response()->json(['products' => $product],200);
+//}
